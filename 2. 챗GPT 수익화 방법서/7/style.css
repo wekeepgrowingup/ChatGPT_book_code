@@ -1,0 +1,30 @@
+body {
+    font-family: sans-serif;
+    text-align: center;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  #start-btn {
+    margin-top: 50px;
+    padding: 10px 20px;
+    font-size: 24px;
+  }
+  
+  #question-container {
+    margin-top: 50px;
+  }
+  
+  .response-btn {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 18px;
+  }
+  
+  #result-container {
+    margin-top: 50px;
+    font-size: 24px;
+  }
+  

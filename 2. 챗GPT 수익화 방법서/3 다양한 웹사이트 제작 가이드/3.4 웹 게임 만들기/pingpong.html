@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ping Pong Game</title>
+    <style>
+      canvas {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="gameCanvas" width="600" height="400"></canvas>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+      // 게임을 시작하기 위한 변수 설정
+      var canvas;
+      var canvasContext;
+      var ballX = 300;
+      var ballY = 200;
+      var ballSpeedX = 5;
+      var ballSpeedY = 7;
+
+      var player1Score = 0;
+      var player2Score = 0;
+      const WINNING_SCORE = 3;
+
+      var showingWinScreen = false;
+
+      // 패들 크기 및 위치 설정
+      var paddle1Y = 250;
+      var paddle2Y = 250;
+      const PADDLE_HEIGHT = 100;
+      const PADDLE_THICKNESS = 10;
+
+      // 패들 이동을 위한 변수 설정
+      var upArrowPressed = false;
+      var downArrowPressed = false;
+
+      // 이벤트 리스너 추가
+      window.onload = function () {
+        canvas = document.getElementById("gameCanvas");
+        canvasContext = canvas.getContext("2d");
+
+        setInterval(function () {
+          moveEverything();
+          drawEverything();
+        }, 1000 / 60);
+
+        canvas.addEventListener("mousedown", handleMouseClick);
+
+        canvas.addEventListener("mousemove", function (evt) {
+          var mousePos = calculateMousePos(evt);
+          paddle1Y = mousePos.y - PADDLE_HEIGHT / 2;
+        });
+
+        $(document).keydown(function (event) {
+          if (event.which == 38) {
+            upArrowPressed = true;
+          }
+          if (event.which == 40) {
+            downArrowPressed = true;
+          }
+        });
+
+        $(document).keyup(function (event) {
+          if (event.which == 38) {
+            upArrowPressed = false;
+          }
+          if (event.which == 40) {
+            downArrowPressed = false;
+          }
+        });
+      };
+
+      // 마우스 이벤트 핸들러
+      function handleMouseClick(evt) {
+        if (showingWinScreen) {
+          player1Score = 0;
+          player2Score = 0;
+          showingWinScreen = false;
+        }
+      }
+
+      // 마우스 위치 계산
+      function calculateMousePos(evt) {
+        var rect = canvas.getBoundingClientRect();
+        var root = document.documentElement;
+        var mouseX = evt.clientX - rect.left - root.scrollLeft;
+        var mouseY = evt.clientY - rect.top - root.scrollTop;
+        return {
+          x: mouseX,
+          y: mouseY,
+        };
+      }
+
+      // 공과 패들의 충돌 감지 함수
+      function ballPaddleCollisionDetection() {
+        if (ballX < 0 + PADDLE_THICKNESS) {
+          if (ballY > paddle1Y && ballY < paddle1Y + PADDLE_HEIGHT) {
+            ballSpeed
+X = -ballSpeedX;
+                    // 패들에서
+        var deltaY = ballY - (paddle1Y + PADDLE_HEIGHT / 2);
+        ballSpeedY = deltaY * 0.35;
+      } else {
+        player2Score++;
+        ballReset();
+      }
+    }
+    if (ballX > canvas.width - PADDLE_THICKNESS) {
+      if (ballY > paddle2Y && ballY < paddle2Y + PADDLE_HEIGHT) {
+        ballSpeedX = -ballSpeedX;
+
+        // 패들에서
+        var deltaY = ballY - (paddle2Y + PADDLE_HEIGHT / 2);
+        ballSpeedY = deltaY * 0.35;
+      } else {
+        player1Score++;
+        ballReset();
+      }
+    }
+  }
+
+  // 공 위치 초기화
+  function ballReset() {
+    if (player1Score >= WINNING_SCORE || player2Score >= WINNING_SCORE) {
+      showingWinScreen = true;
+    }
+
+    ballSpeedX = -ballSpeedX;
+    ballX = canvas.width / 2;
+    ballY = canvas.height / 2;
+
+    // 추가된 부분: 재시작 시 공의 이동 방향 변경
+    ballSpeedY = -ballSpeedY;
+  }
+
+  // 패들 위치 업데이트
+  function movePaddles() {
+    if (upArrowPressed && paddle2Y > 0) {
+      paddle2Y -= 5;
+    }
+    if (downArrowPressed && paddle2Y < canvas.height - PADDLE_HEIGHT) {
+      paddle2Y += 5;
+    }
+  }
+
+  // 공 위치 업데이트
+  function moveBall() {
+    ballX += ballSpeedX;
+    ballY += ballSpeedY;
+
+    if (ballX < 0) {
+      ballSpeedX = -ballSpeedX;
+    }
+    if (ballX > canvas.width) {
+      ballSpeedX = -ballSpeedX;
+    }
+    if (ballY < 0) {
+      ballSpeedY = -ballSpeedY;
+    }
+    if (ballY > canvas.height) {
+      ballSpeedY = -ballSpeedY;
+    }
+  }
+
+  // 게임 로직 함수
+  function moveEverything() {
+    if (showingWinScreen) {
+      return;
+    }
+
+    movePaddles();
+    moveBall();
+    ballPaddleCollisionDetection();
+  }
+
+  // 캔버스에 그리기
+  function drawEverything() {
+    // 캔버스 그리기
+    colorRect(0, 0, canvas.width, canvas.height, "black");
+
+    if (showingWinScreen) {
+      canvasContext.fillStyle = "white";
+      canvasContext.fillText(
+        "Click to continue",
+        canvas.width / 2,
+        canvas.height / 2
+      );
+      return;
+    }
+
+    // 왼쪽 패들 그리기
+    colorRect(0, paddle1Y, PADDLE_THICKNESS, PADDLE_HEIGHT, "white");
+
+    // 오른쪽 패들 그리기
+    colorRect(
+      canvas.width - PADDLE_THICKNESS,
+      paddle2Y,
+      PADDLE_THICKNESS,
+      PADDLE_HEIGHT,
+      "white"
+    );
+
+    // 공 그리기
+    colorCircle(ballX, ballY, 10, "white");
+
+    // 점수 그리기
+    canvasContext.fillText(player1Score, 100, 100);
+    canvasContext
+.fillText(player2Score, canvas.width - 100, 100);
+}
+        // 캔버스에서 직사각형 그리기
+  function colorRect(leftX, topY, width, height, drawColor) {
+    canvasContext.fillStyle = drawColor;
+    canvasContext.fillRect(leftX, topY, width, height);
+  }
+
+  // 캔버스에서 원 그리기
+  function colorCircle(centerX, centerY, radius, drawColor) {
+    canvasContext.fillStyle = drawColor;
+    canvasContext.beginPath();
+    canvasContext.arc(centerX, centerY, radius, 0, Math.PI * 2, true);
+    canvasContext.fill();
+  }
+</script>
+</body>
+</html>

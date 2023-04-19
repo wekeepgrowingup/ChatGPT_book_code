@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>타이머와 스톱워치</title>
+	<style type="text/css">
+		body {
+			font-size: 20px;
+			text-align: center;
+			padding-top: 50px;
+		}
+		input[type="number"] {
+			width: 50px;
+			font-size: 20px;
+		}
+		#timer, #stopwatch {
+			font-size: 60px;
+			padding: 20px;
+		}
+	</style>
+</head>
+<body>
+	<h1>타이머와 스톱워치</h1>
+	<h2>타이머</h2>
+	<label for="hours">시:</label>
+	<input type="number" id="hours" min="0" max="23" value="0"> 
+	<label for="minutes">분:</label>
+	<input type="number" id="minutes" min="0" max="59" value="0"> 
+	<label for="seconds">초:</label>
+	<input type="number" id="seconds" min="0" max="59" value="0"> 
+	<br><br>
+	<button onclick="startTimer()">시작</button>
+	<button onclick="stopTimer()">정지</button>
+	<br><br>
+	<div id="timer"></div>
+	<h2>스톱워치</h2>
+	<button onclick="startStopwatch()">시작</button>
+	<button onclick="stopStopwatch()">정지</button>
+	<button onclick="resetStopwatch()">초기화</button>
+	<br><br>
+	<div id="stopwatch">00:00:00</div>
+	<script type="text/javascript">
+		var timer;
+		var timerSeconds = 0;
+		var stopwatch;
+		var stopwatchSeconds = 0;
+
+		function startTimer() {
+			var hours = parseInt(document.getElementById("hours").value);
+			var minutes = parseInt(document.getElementById("minutes").value);
+			var seconds = parseInt(document.getElementById("seconds").value);
+
+			timerSeconds = hours * 3600 + minutes * 60 + seconds;
+
+			timer = setInterval(function() {
+				if (timerSeconds <= 0) {
+					clearInterval(timer);
+					document.getElementById("timer").innerHTML = "끝!";
+				} else {
+					var hours = Math.floor(timerSeconds / 3600);
+					var minutes = Math.floor((timerSeconds - hours * 3600) / 60);
+					var seconds = timerSeconds - hours * 3600 - minutes * 60;
+					document.getElementById("timer").innerHTML = hours + ":" + padZero(minutes) + ":" + padZero(seconds);
+					timerSeconds--;
+				}
+			}, 1000);
+		}
+
+		function stopTimer() {
+			clearInterval(timer);
+		}
+
+		function startStopwatch() {
+			if (!stopwatch) {
+				stopwatch = setInterval(function() {
+					stopwatchSeconds++;
+
+					var hours = Math.floor(stopwatchSeconds / 3600);
+					var minutes = Math.floor((stopwatchSeconds - hours * 3600) / 60);
+					var seconds = stopwatchSeconds - hours * 3600 - minutes * 60;
+					document.getElementById("stopwatch").innerHTML = padZero(hours) + ":" + padZero(minutes) + ":" + padZero(seconds);
+				}, 1000);
+			}
+		}
+
+		function stopStopwatch() {
+clearInterval(stopwatch);
+stopwatch = null;
+}
+	function resetStopwatch() {
+		stopwatchSeconds = 0;
+		stopStopwatch();
+		document.getElementById("stopwatch").innerHTML = "00:00:00";
+	}
+
+	function padZero(num) {
+		if (num < 10) {
+			return "0" + num;
+		} else {
+			return num;
+		}
+	}
+</script>
+</body>
+</html>

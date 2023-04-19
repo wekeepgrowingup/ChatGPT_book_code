@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>간단한 메모장</title>
+    <style>
+      #memo-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+
+      #buttons {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+      }
+
+      #buttons button {
+        margin-right: 10px;
+        margin-bottom: 10px;
+      }
+
+      #color-picker {
+        margin-left: 10px;
+        margin-bottom: 10px;
+      }
+
+      textarea {
+        flex-grow: 1;
+        font-size: 16px;
+        font-weight: normal;
+        font-style: normal;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="memo-container">
+      <div id="buttons">
+        <button id="bold">굵게</button>
+        <button id="italic">기울임</button>
+        <button id="underline">밑줄</button>
+        <button id="increase-font-size">글씨크기+</button>
+        <button id="decrease-font-size">글씨크기-</button>
+        <input type="color" id="color-picker">
+      </div>
+      <textarea id="memo"></textarea>
+    </div>
+
+    <script>
+      const memo = document.getElementById('memo');
+      const boldButton = document.getElementById('bold');
+      const italicButton = document.getElementById('italic');
+      const underlineButton = document.getElementById('underline');
+      const increaseFontSizeButton = document.getElementById('increase-font-size');
+      const decreaseFontSizeButton = document.getElementById('decrease-font-size');
+      const colorPicker = document.getElementById('color-picker');
+
+      const storageKey = 'memo';
+      const styleKeys = ['fontSize', 'fontWeight', 'fontStyle', 'textDecoration', 'color'];
+
+      function saveMemo() {
+        localStorage.setItem(storageKey, memo.value);
+        styleKeys.forEach(key => localStorage.setItem(`${storageKey}_${key}`, memo.style[key] || ''));
+      }
+
+      function loadMemo() {
+        const savedMemo = localStorage.getItem(storageKey);
+        if (savedMemo) {
+          memo.value = savedMemo;
+        }
+        styleKeys.forEach(key => {
+          const value = localStorage.getItem(`${storageKey}_${key}`);
+          if (value) {
+            memo.style[key] = value;
+          }
+        });
+      }
+
+      memo.addEventListener('input', saveMemo);
+      window.addEventListener('load', loadMemo);
+
+      boldButton.addEventListener('click', () => {
+        memo.style.fontWeight = memo.style.fontWeight === 'bold' ? 'normal' : 'bold';
+        saveMemo();
+      });
+
+      italicButton.addEventListener('click', () => {
+        memo.style.fontStyle = memo.style.fontStyle === 'italic' ? 'normal' : 'italic';
+        saveMemo();
+      });
+
+      underlineButton.addEventListener('click', () => {
+        memo.style.textDecoration = memo.style.textDecoration === 'underline' ? 'none' : 'underline';
+        saveMemo();
+      });
+
+      increaseFontSizeButton.addEventListener('click', () => {
+        memo.style.fontSize = parseInt(memo.style.fontSize || '16', 10) + 1 + 'px';
+        saveMemo();
+      });
+
+      decreaseFontSizeButton.addEventListener('click', () => {
+        memo.style.fontSize = parseInt(memo.style.fontSize || '16', 10) - 1 + 'px';
+      });
+
+      colorPicker.addEventListener('input', () => {
+       memo.style.color = colorPicker.value;
+      saveMemo();
+    });
+</script>
+ </body>
+</html>
